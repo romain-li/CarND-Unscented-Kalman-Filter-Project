@@ -53,7 +53,7 @@ public:
   double std_radphi_;
 
   ///* Radar measurement noise standard deviation radius change in m/s
-  double std_radrd_ ;
+  double std_radrd_;
 
   ///* Weights of sigma points
   VectorXd weights_;
@@ -66,6 +66,21 @@ public:
 
   ///* Sigma point spreading parameter
   double lambda_;
+
+  ///* Laser and radar measurement dimension
+  int las_n_z_;
+  int rad_n_z_;
+
+  ///* Laser and radar Measurement noise covariance matrix
+  MatrixXd las_R_;
+  MatrixXd rad_R_;
+
+  ///* Some variables for optimizie code performance
+  double std_a_square_;
+  double std_yawdd_square_;
+
+  double sum_lanmda_n_aug_;
+  double sqrt_sum_lanmda_n_aug_;
 
 
   /**
@@ -102,6 +117,31 @@ public:
    * @param meas_package The measurement at k+1
    */
   void UpdateRadar(MeasurementPackage meas_package);
+
+  /**
+   * Generate the augmented sigma points
+   */
+  MatrixXd GenerateAugmentedSigmaPoints();
+
+  /**
+   * Predict sigma points
+   * @param Xsig_aug augmented sigma points
+   * @param delta_t time delta
+   */
+  void SigmaPointPrediction(MatrixXd Xsig_aug, double delta_t);
+
+  /**
+   * Predict mean and convariance matrix
+   */
+  void PredictMeanAndCovariance();
+
+  /**
+   * Base processor for all the radar and laser update.
+   * @param n_z Measurement dimension of z
+   */
+  void BaseUpdate(int n_z, VectorXd z, MatrixXd Zsig, MatrixXd R);
 };
+
+void NormalizeAngle(double &phi);
 
 #endif /* UKF_H */
